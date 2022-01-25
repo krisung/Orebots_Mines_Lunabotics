@@ -29,7 +29,7 @@ void setup() {
 }
 void loop() {
  requestMaster();
-}12
+}
 void requestMaster( ) { /* function requestMaster */
  ////Request to master
  if ((millis() - previousRequest) > UPDATE_TIME) { // client connect to server every 500ms
@@ -45,10 +45,10 @@ void requestMaster( ) { /* function requestMaster */
        Serial.print("command received: "); Serial.println(command);
        if (command == "1") {
          Serial.println("LED ON");
-         digitalWrite(LED, LOW);
+         digitalWrite(LED, HIGH);
        } else {
          Serial.println("LED OFF");
-         digitalWrite(LED, HIGH);
+         digitalWrite(LED, LOW);
        }
      }
    }

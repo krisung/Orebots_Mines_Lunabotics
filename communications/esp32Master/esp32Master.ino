@@ -11,6 +11,7 @@ const char* password = "MinesLunaboticsWifi1!";
 bool sendCmd = false;
 String slaveCmd = "0";
 String slaveState = "0";
+String command = "0";
 //Objects
 WiFiServer server(80);
 WiFiClient browser;
@@ -33,8 +34,20 @@ void setup() {
  Serial.print(F(" connected to Wifi! IP address : http://")); Serial.println(WiFi.localIP()); // Print the IP address
  pinMode(LED, OUTPUT);
 }
+
 void loop() {
- clientRequest();
+
+ if (request.indexOf("Slave0") == 0) {
+       //Handle slave request
+       Serial.print("From "); Serial.println(request);
+       int index = request.indexOf(":");
+       String slaveid = request.substring(0, index);
+       slaveState = request.substring(request.indexOf("x") + 1, request.length());
+       Serial.print("state received: "); Serial.println(slaveState);
+  
+       if (Serial.available() == 1){
+        handleRequest(Serial.read())
+       }
 }
 void clientRequest( ) { /* function clientRequest */
  ////Check if client connected
@@ -54,6 +67,8 @@ void clientRequest( ) { /* function clientRequest */
        slaveState = request.substring(request.indexOf("x") + 1, request.length());
        Serial.print("state received: "); Serial.println(slaveState);
        client.print(nom);
+
+       
        if (sendCmd) {
          sendCmd = false;
          client.println(": Ok " + slaveid + "! Set state to x" + String(slaveCmd) + "\r");
@@ -72,17 +87,17 @@ void clientRequest( ) { /* function clientRequest */
 }
 void handleRequest(String request) { /* function handleRequest */
  ////Check if client connected
- if (request.indexOf("/light1on") > 0)  {
-   digitalWrite(LED, LOW);
- }
- if (request.indexOf("/light1off") > 0)  {
+ if (request.indexOf("mON") >= 0)  {
    digitalWrite(LED, HIGH);
  }
- if (request.indexOf("/light2on") > 0)  {
+ if (request.indexOf("mOFF") >= 0)  {
+   digitalWrite(LED, LOW);
+ }
+ if (request.indexOf("sON") >= 0)  {
    sendCmd = true;
    slaveCmd = "1";
  }
- if (request.indexOf("/light2off") > 0)  {
+ if (request.indexOf("sOFF") >= 0)  {
    sendCmd = true;
    slaveCmd = "0";
  }
