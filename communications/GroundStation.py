@@ -12,9 +12,15 @@ port = 80
 # 2 - Backward
 # 3 - Left
 # 4 - Right
+# 5 - Deploy Systems
+# 6 - Begin/End Auger
+# 7 - Begin/End Conveyor
 
 command = 0
 newCommand = 0
+augerState = 0
+conveyorState = 0
+
 
 print("Ground Station initialized")
 
