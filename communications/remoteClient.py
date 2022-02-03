@@ -4,9 +4,13 @@ sock = socket.socket()
 host = "192.168.0.103"
 port = 80
 
-sock.connect((host, port))
-sock.send(bytes("test", "UTF-8"))
-
-input("Push a key to exit")
+while(True):
+    command = input("Enter a message to send, or enter 'exit'")
+    if (command == "exit\n"):
+        break
+    sock.connect((host, port))
+    sock.send(bytes("test", "UTF-8"))
 
 sock.close()
+
+
