@@ -12,9 +12,13 @@ port = 80
 # 2 - Backward
 # 3 - Left
 # 4 - Right
-# 5 - Deploy Systems
-# 6 - Begin/End Auger
-# 7 - Begin/End Conveyor
+# 5 - Rotate Auger for Deployment
+# 6 - Undeploy Auger
+# 7 - Begin/Stop rotating auger
+# 8 - Lower Stage Auger Down
+# 9 - Lower Stage Auger Up
+# A - Upper Stage Auger Down
+# B - Upper Stage Auger Up
 
 command = "0"
 newCommand = "0"
@@ -39,6 +43,20 @@ while True:
             newCommand = "3"
     elif keyboard.is_pressed('d'):
             newCommand = "4"
+    elif keyboard.is_pressed('h'):
+            newCommand = "5"
+    elif keyboard.is_pressed('y'):
+            newCommand = "6"
+    elif keyboard.is_pressed('l'):
+            newCommand = "7"
+    elif keyboard.is_pressed('j'):
+            newCommand = "8"
+    elif keyboard.is_pressed('u'):
+            newCommand = "9"
+    elif keyboard.is_pressed('k'):
+            newCommand = "A"
+    elif keyboard.is_pressed('i'):
+            newCommand = "B"
     else:
             newCommand = "0"
     if (newCommand != command):
@@ -53,6 +71,20 @@ while True:
             print("Rotating Left")
         elif (command == "4"):
             print("Rotating Right")
+        elif (command == "5"):
+            print("Deploying")
+        elif (command == "6"):
+            print("Undeploying")
+        elif (command == "7"):
+            print("Start/Stopping Auger")
+        elif (command == "8"):
+            print("Lower Top Stepper")
+        elif (command == "9"):
+            print("Raise Top Stepper")
+        elif (command == "A"):
+            print("Lower Bottom Stepper")
+        elif (command == "B"):
+            print("Raise Bottom Stepper")
         sock.send(bytes(command, "UTF-8")) 
 sock.close()
 print("Rover Disconnected")

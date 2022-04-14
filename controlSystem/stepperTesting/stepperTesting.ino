@@ -1,8 +1,8 @@
-#define stepperPulsePin 23
+#define stepperPulsePin 18
 #define stepperDirPin 5
 
 int dutyCycle = 128;
-const int PWMChannel = 0;
+const int PWMChannel = 4;
 const int PWMResolution = 13;
 const int PWMFreq = 1000;
 
