@@ -1,5 +1,4 @@
 import keyboard
-import time
 import socket
 
 sock = socket.socket()
@@ -22,48 +21,42 @@ port = 80
 
 command = "0"
 newCommand = "0"
-augerState = 0
-conveyorState = 0
 
+def on_press(key):
+    global command
+    global newCommand
+    try:
+        k = key.char
 
-print("Ground Station initialized")
-
-sock.connect((host, port))
-
-print("Rover Connected, press esc to disconnect")
-
-while True:
-    if keyboard.is_pressed('esc'):
-        break        
-    elif keyboard.is_pressed('s'):
+        if k == 'w':
             newCommand = "1"
-    elif keyboard.is_pressed('w'):
+        elif k == 's':
             newCommand = "2"
-    elif keyboard.is_pressed('a'):
+        elif k == 'a':
             newCommand = "3"
-    elif keyboard.is_pressed('d'):
+        elif k == 'd':
             newCommand = "4"
-    elif keyboard.is_pressed('h'):
+        elif k == 'h':
             newCommand = "5"
-    elif keyboard.is_pressed('y'):
+        elif k == 'y':
             newCommand = "6"
-    elif keyboard.is_pressed('l'):
+        elif k == 'l':
             newCommand = "7"
-    elif keyboard.is_pressed('j'):
+        elif k == 'j':
             newCommand = "8"
-    elif keyboard.is_pressed('u'):
+        elif k == 'u':
             newCommand = "9"
-    elif keyboard.is_pressed('k'):
+        elif k == 'k':
             newCommand = "A"
-    elif keyboard.is_pressed('i'):
+        elif k == 'i':
             newCommand = "B"
-    else:
-            newCommand = "0"
-    if (newCommand != command):
+    except:
+        k = key.name
+        newCommand = command
+
+    if(newCommand != command):
         command = newCommand
-        if (command == "0"):
-            print("Stopped")
-        elif (command == "1"):
+        if (command == "1"):
             print("Moving Forward")
         elif (command == "2"):
             print("Moving Backwards")
@@ -78,13 +71,88 @@ while True:
         elif (command == "7"):
             print("Start/Stopping Auger")
         elif (command == "8"):
-            print("Lower Top Stepper")
-        elif (command == "9"):
-            print("Raise Top Stepper")
-        elif (command == "A"):
             print("Lower Bottom Stepper")
-        elif (command == "B"):
+        elif (command == "9"):
             print("Raise Bottom Stepper")
-        sock.send(bytes(command, "UTF-8")) 
-sock.close()
-print("Rover Disconnected")
+        elif (command == "A"):
+            print("Lower Top Stepper")
+        elif (command == "B"):
+            print("Raise Top Stepper")
+        sock.send(bytes(command, "UTF-8")) # Sends command when new 
+
+def on_release(key):
+    global command
+    command = "0"
+    print("Stopped")
+    sock.send(bytes(command, "UTF-8")) # Sends command when new 
+
+
+print("Ground Station initialized")
+
+# Connects to the Rover
+sock.connect((host, port))
+
+print("Rover Connected, press esc to disconnect")
+
+with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+    listener.join()
+
+
+
+# sock.close()
+# print("Rover Disconnected")
+
+# while True:
+#     if keyboard.is_pressed('esc'):
+#         break        
+#     elif keyboard.is_pressed('w'):
+#             newCommand = "1"
+#     elif keyboard.is_pressed('s'):
+#             newCommand = "2"
+#     elif keyboard.is_pressed('a'):
+#             newCommand = "3"
+#     elif keyboard.is_pressed('d'):
+#             newCommand = "4"
+#     elif keyboard.is_pressed('h'):
+#             newCommand = "5"
+#     elif keyboard.is_pressed('y'):
+#             newCommand = "6"
+#     elif keyboard.is_pressed('l'):
+#             newCommand = "7"
+#     elif keyboard.is_pressed('j'):
+#             newCommand = "8"
+#     elif keyboard.is_pressed('u'):
+#             newCommand = "9"
+#     elif keyboard.is_pressed('k'):
+#             newCommand = "A"
+#     elif keyboard.is_pressed('i'):
+#             newCommand = "B"
+#     else:
+#             newCommand = "0"
+#     if (newCommand != command):
+#         command = newCommand
+#         if (command == "0"):
+#             print("Stopped")
+#         elif (command == "1"):
+#             print("Moving Forward")
+#         elif (command == "2"):
+#             print("Moving Backwards")
+#         elif (command == "3"):
+#             print("Rotating Left")
+#         elif (command == "4"):
+#             print("Rotating Right")
+#         elif (command == "5"):
+#             print("Deploying")
+#         elif (command == "6"):
+#             print("Undeploying")
+#         elif (command == "7"):
+#             print("Start/Stopping Auger")
+#         elif (command == "8"):
+#             print("Lower Bottom Stepper")
+#         elif (command == "9"):
+#             print("Raise Bottom Stepper")
+#         elif (command == "A"):
+#             print("Lower Top Stepper")
+#         elif (command == "B"):
+#             print("Raise Top Stepper")
+#         sock.send(bytes(command, "UTF-8")) # Sends command when new 
