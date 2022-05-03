@@ -13,22 +13,22 @@
 #   the rover.
 #
 #   Command Prompts
-#   0 - IDLE
-#   1 - Forward
-#   2 - Backward
-#   3 - Left
-#   4 - Right
-#   5 - Rotate Auger for Deployment
-#   6 - Undeploy Auger
-#   7 - Begin/Stop rotating auger
-#   8 - Lower Stage Auger Down
-#   9 - Lower Stage Auger Up
-#   A - Upper Stage Auger Down
-#   B - Upper Stage Auger Up
-#   C - Extend Linear Actuators
-#   D - Contract Linear Actuators
-#   E - Spin Collection System Fast
-#   F - Adjust Collection System
+#   release -> 0 -> IDLE
+#   w       -> 1 -> Forward
+#   s       -> 2 -> Backward
+#   a       -> 3 -> Left
+#   d       -> 4 -> Right
+#   h       -> 5 -> Rotate Auger for Deployment
+#   y       -> 6 -> Undeploy Auger
+#   l       -> 7 -> Begin/Stop rotating auger
+#   j       -> 8 -> Lower Stage Auger Down
+#   u       -> 9 -> Lower Stage Auger Up
+#   k       -> A -> Upper Stage Auger Down
+#   i       -> B -> Upper Stage Auger Up
+#   t       -> C -> Extend Linear Actuators
+#   g       -> D -> Contract Linear Actuators
+#   b       -> E -> Spin Collection System Fast
+#   n       -> F -> Adjust Collection System
 #---------------------------------------------------------------
 
 from pynput import keyboard
