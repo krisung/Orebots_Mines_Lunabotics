@@ -15,3 +15,8 @@ for wireless connection.
 The pinouts for the ESP32 can be found in the header of the esp32Controller
 script, while the keyboard commands can be found in the header for the 
 GroundStation script.
+
+The files named "video reciever.py" and "Video Transmitter.py" are the python 
+scripts to stream video from the cameras on the robot to the ground station. The
+cameras on the robot use the file "Video Transmitter.py" and run on a Raspberry Pi 
+and use a USB webcam. The Ground Station uses the file "video reciever.py". Both the scripts were written in Python 3.9 and in order to work should be run in the order of "video reciever.py" from the Ground Station followed by "Video Transmitter.py" being run on the robot.
