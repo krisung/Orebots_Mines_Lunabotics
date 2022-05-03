@@ -12,6 +12,8 @@
 #define upperStepperDirPin 5 
 #define lowerStepperPulsePin 16
 #define lowerStepperDirPin 4
+#define linearActuatorsPin 12
+#define collectionSpinPin 13
 
 const uint ServerPort = 80;
 WiFiServer Server(ServerPort);
@@ -22,12 +24,15 @@ Servo leftMotors;
 Servo rightMotors;
 Servo augerSpin;
 Servo augerDeploy;
+Servo linearActuators;
+Servo collectionSpin;
 
 void CheckForConnections();
 void executeCommand(String command);
 String ReceiveData();
 void motorStates();
 void augerStates();
+void collectionStates();
 
 const char ssid[] = "Lunabotics_Selene_2.4";
 const char pass[] = "MinesLunaboticsWifi1!";
@@ -47,17 +52,17 @@ int dutyCycle = 128;
 const int PWMChannel_Upper = 4;
 const int PWMChannel_Lower = 5;
 const int PWMResolution = 13;
-int PWMFreq_Upper = 1500;
-int PWMFreq_Lower = 1500;
+int PWMFreq_Upper = 2000;
+int PWMFreq_Lower = 2000;
 
 bool augerRotation = false;
 
 enum motorStates_t {WAIT_M, FORWARD, BACKWARD, ROT_RIGHT, ROT_LEFT};
 enum augerStates_t {WAIT_A, DEPLOY, UNDEPLOY, BEG_ROT, STOP_ROT, LOWER_BOT, RAISE_BOT, LOWER_TOP, RAISE_TOP};
-//enum stepperTestStates_t {WAIT_S, FOR, BAC};
+enum collectionStates_t {WAIT_C, EXTEND_ACT, CONTRACT_ACT, ROTATE_YEET, ROTATE_ADJUST};
 motorStates_t motorState = WAIT_M;
-//stepperTestStates_t stepperState = WAIT_S;
 augerStates_t augerState = WAIT_A;
+collectionStates_t collectionState = WAIT_C;
 
 //# Command Prompts
 //# 0 - IDLE
@@ -96,18 +101,21 @@ void setup() {
   rightMotors.writeMicroseconds(1500);
   augerSpin.writeMicroseconds(1500);
   augerDeploy.writeMicroseconds(1500);
+  linearActuators.writeMicroseconds(1500);
+  collectionSpin.writeMicroseconds(1500);
 
   leftMotors.attach(leftMotorPin);
   rightMotors.attach(rightMotorPin);
   augerSpin.attach(augerSpinnyGuyPin);
   augerDeploy.attach(augerDeployPin);
+  linearActuators.attach(linearActuatorsPin);
+  collectionSpin.attach(collectionSpinPin);
 
   ledcSetup(PWMChannel_Upper, PWMFreq_Upper, PWMResolution);
   ledcSetup(PWMChannel_Lower, PWMFreq_Lower, PWMResolution);
 
   ledcAttachPin(upperStepperPulsePin, PWMChannel_Upper);
   ledcAttachPin(lowerStepperPulsePin, PWMChannel_Lower);
-  
 
 }
 
@@ -142,11 +150,11 @@ void CheckForConnections(){
 
 void executeCommand(String command){
   char trimmedCommand = command[0];
-  //Serial.println(trimmedCommand);
   if(trimmedCommand == '0'){
     //Serial.println("Stopped");
     motorState = WAIT_M;
     augerState = WAIT_A;
+    collectionState = WAIT_C;
   } else if(trimmedCommand == '1') {
     //Serial.println("Moving Forward");
     motorState = FORWARD;
@@ -168,10 +176,10 @@ void executeCommand(String command){
   }else if(trimmedCommand == '7'){
     if (augerRotation == true){
 //      Serial.println("Stop Rotation");
-      augerRotation == false;
+      augerRotation = false;
     } else {
 //      Serial.println("Start Rotation");
-      augerRotation == true;
+      augerRotation = true;
     }
   } else if(trimmedCommand == '8'){
     //Serial.println("Lower Bottom Stage");
@@ -185,13 +193,19 @@ void executeCommand(String command){
   } else if(trimmedCommand == 'B'){
     //Serial.println("Raise Top Stage");
     augerState = RAISE_TOP;
-  }//else{
-   // Serial.print("Invalid Command, received: ");
-   // Serial.println(trimmedCommand);
-  //}
+  } else if(trimmedCommand == 'C'){
+      collectionState = EXTEND_ACT;
+  } else if(trimmedCommand == 'D'){
+      collectionState = CONTRACT_ACT;
+  } else if(trimmedCommand == 'E'){
+      collectionState = ROTATE_YEET;
+  } else if(trimmedCommand == 'F'){
+      collectionState = ROTATE_ADJUST;
+  }
 
   motorStates();
   augerStates();
+  collectionStates();
 }
 
 void motorStates(){
@@ -201,20 +215,20 @@ void motorStates(){
       rightPWMDesired = 1500;
      break;
     case FORWARD:
-      leftPWMDesired = 1600;
-      rightPWMDesired = 1400;
+      leftPWMDesired = 1700;
+      rightPWMDesired = 1300;
       break;
     case BACKWARD:
-      leftPWMDesired = 1400;
-      rightPWMDesired = 1600;
+      leftPWMDesired = 1300;
+      rightPWMDesired = 1700;
       break;
     case ROT_LEFT:
-      leftPWMDesired = 1400;
-      rightPWMDesired = 1400;
+      leftPWMDesired = 1300;
+      rightPWMDesired = 1300;
       break;
     case ROT_RIGHT:
-      leftPWMDesired = 1600;
-      rightPWMDesired = 1600;
+      leftPWMDesired = 1700;
+      rightPWMDesired = 1700;
       break;
   }
 
@@ -236,14 +250,14 @@ void augerStates(){
       //ledcChangeFrequency(PWMChannel_Lower, 0, PWMResolution);
       ledcWrite(PWMChannel_Upper, 8192);
       ledcWrite(PWMChannel_Lower, 8192);
-      augerDeploy.writeMicroseconds(1500);
+      augerDeploy.writeMicroseconds(1550);
       break;
     case DEPLOY:
-      augerDeploy.writeMicroseconds(1400);
+      augerDeploy.writeMicroseconds(1850); //1850
       //Serial.println("Wrote Deploy");
       break;
     case UNDEPLOY:
-      augerDeploy.writeMicroseconds(1600);
+      augerDeploy.writeMicroseconds(1450); //1400
       //Serial.println("Wrote Undeploy");
       break;
     case LOWER_BOT:
@@ -272,11 +286,32 @@ void augerStates(){
       break;
   }
   if(augerRotation == true){
-    augerSpin.writeMicroseconds(1400);
+    augerSpin.writeMicroseconds(1600);
     //Serial.println("Wrote Spin");
   } else {
     augerSpin.writeMicroseconds(1500);
     //Serial.println("Wrote Stop");
+  }
+}
+
+void collectionStates(){
+  switch(collectionState){
+    case WAIT_C:
+      linearActuators.writeMicroseconds(1500);
+      collectionSpin.writeMicroseconds(1500);
+      break;
+    case EXTEND_ACT:
+      linearActuators.writeMicroseconds(1000);
+      break;
+    case CONTRACT_ACT:
+      linearActuators.writeMicroseconds(2000);
+      break;
+    case ROTATE_YEET:
+      collectionSpin.writeMicroseconds(1200);
+      break;
+    case ROTATE_ADJUST:
+      collectionSpin.writeMicroseconds(1400);
+      break;
   }
 }
 

@@ -1,4 +1,4 @@
-import keyboard
+from pynput import keyboard
 import socket
 
 sock = socket.socket()
@@ -18,6 +18,10 @@ port = 80
 # 9 - Lower Stage Auger Up
 # A - Upper Stage Auger Down
 # B - Upper Stage Auger Up
+# C - Extend Linear Actuators
+# D - Contract Linear Actuators
+# E - YEET Collection System
+# F - Adjust Collection System
 
 command = "0"
 newCommand = "0"
@@ -50,6 +54,14 @@ def on_press(key):
             newCommand = "A"
         elif k == 'i':
             newCommand = "B"
+        elif k == 't':
+            newCommand = "C"
+        elif k == 'g':
+            newCommand = "D"
+        elif k == 'b':
+            newCommand = "E"
+        elif k == 'n':
+            newCommand = "F"
     except:
         k = key.name
         newCommand = command
@@ -78,6 +90,14 @@ def on_press(key):
             print("Lower Top Stepper")
         elif (command == "B"):
             print("Raise Top Stepper")
+        elif (command == "C"):
+            print("Extending Linear Actuators")
+        elif (command == "D"):
+            print("Contracting Linear Actuators")
+        elif (command == "E"):
+            print("Rotating Collection Belt -- YEET SPEED")
+        elif (command == "F"):
+            print("Rotating Collection Belt -- Adjust Speed")
         sock.send(bytes(command, "UTF-8")) # Sends command when new 
 
 def on_release(key):
